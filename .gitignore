@@ -1,0 +1,61 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# macOS metadata
+._*
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# JetBrains IDEs
+.idea/
+
+# PowerShell
+*.ps1~ 
+*.psm1~
+*.tmp
+*.temp
+
+# Temporary and backup files
+*.bak
+*.backup
+*.swp
+*.swo
+*~
+
+# Logs and transient output
+*.log
+*.out
+*.cache
+*.tmp
+
+# Windows temporary files
+Thumbs.db
+Desktop.ini
+
+# Secrets and credentials
+.env
+.env.*
+*.pem
+*.key
+*.pfx
+*.p12
+credentials.json
+secrets.json
+
+# Local configuration
+local/
+private/
+secrets/
+
+# PowerShell transcript files
+PowerShell_transcript*.txt
+
+# Generated reports and exports
+*.zip
+*.7z
+*.tar
+*.gz
