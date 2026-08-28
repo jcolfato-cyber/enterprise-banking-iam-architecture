@@ -1,0 +1,11 @@
+EmployeeID,GivenName,Surname,Username,Department,JobTitle,AccountType,TargetOU,PrimaryGroup,Enabled
+EMP001,JC,Olfato,adm.jc.olfato,IT-Security,Identity Architect,Privileged,"OU=Privileged_Accounts,OU=Tier0_Identity_Infrastructure,DC=banking,DC=lab",GG-T0-AD-Administrators,TRUE
+EMP002,Michael,Carter,adm.syd.srv01,IT-Operations,Infrastructure Admin,Privileged,"OU=Server_Admins,OU=Tier1_Server_Infrastructure,DC=banking,DC=lab",GG-T1-Server-Administrators,TRUE
+EMP003,Sarah,Mitchell,adm.syd.help01,IT-Support,Desktop Support Tech,Privileged,"OU=Desktop_Support,OU=Tier2_User_Computing,DC=banking,DC=lab",GG-T2-Desktop-Support,TRUE
+EMP004,Emily,Taylor,emily.taylor,Finance,Financial Analyst,Standard,"OU=Corporate_Users,OU=Tier2_User_Computing,DC=banking,DC=lab",GG-Department-Finance,TRUE
+EMP005,James,Anderson,james.anderson,Human Resources,HR Business Partner,Standard,"OU=Corporate_Users,OU=Tier2_User_Computing,DC=banking,DC=lab",GG-Department-HR,TRUE
+EMP006,Olivia,Thomas,olivia.thomas,Operations,Operations Analyst,Standard,"OU=Corporate_Users,OU=Tier2_User_Computing,DC=banking,DC=lab",GG-Department-Operations,TRUE
+EMP007,Daniel,Moore,daniel.moore,Information Technology,Systems Analyst,Standard,"OU=Corporate_Users,OU=Tier2_User_Computing,DC=banking,DC=lab",GG-Department-IT,TRUE
+SVC001,Service,Backup,svc-sql-banking,IT-Operations,Database Engine Service,Service,"OU=Service_Accounts,DC=banking,DC=lab",GG-Department-IT,TRUE
+SVC002,Service,Monitor,svc-sentinel-log,IT-Security,SIEM Log Ingestion,Service,"OU=Service_Accounts,DC=banking,DC=lab",GG-Department-IT,TRUE
+SVC003,Service,App,svc-app-portal,IT-Operations,Web Application Service,Service,"OU=Service_Accounts,DC=banking,DC=lab",GG-Department-IT,TRUE

@@ -1,4 +1,4 @@
-# Stage 1 — Organisational Unit Provisioning Log
+# Enterprise Banking IAM — Organisational Unit Provisioning Log
 
 ## Provisioning Script
 

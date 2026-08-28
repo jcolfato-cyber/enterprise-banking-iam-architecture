@@ -1,4 +1,4 @@
-# Stage 2 — RBAC Security Group Provisioning Log
+# Enterprise Banking IAM — RBAC Security Group Provisioning Log
 
 ## Provisioning Script
 
