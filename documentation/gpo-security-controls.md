@@ -43,12 +43,12 @@ The Group Policy implementation applies to the `banking.lab` Active Directory la
 
 ## GPO Architecture
 
-The architecture uses four security GPOs supporting domain account security, Domain Controller security, service-account restrictions and administrative tier isolation.
+The implemented architecture uses the existing `Default Domain Policy` for domain account security together with three project security GPOs supporting Domain Controller security, service-account restrictions and administrative tier isolation.
 
 | GPO | Purpose | Effective Scope | Status |
 | --- | --- | --- | --- |
-| `GPO-SEC-Domain-Account-Policy` | Domain password and account-lockout baseline | `banking.lab` domain | Implemented and validated |
-| `DC Security Hardening` | Domain Controller LDAP signing enforcement | `OU=Domain Controllers,DC=banking,DC=lab` | Implemented and validated |
+| `Default Domain Policy` | Domain password and account-lockout policy | `banking.lab` domain | Implemented and validated |
+| `DC Security Hardening` | Domain Controller LDAP signing enforcement and existing DC security configuration | `OU=Domain Controllers,DC=banking,DC=lab` | Implemented and validated |
 | `GPO-SEC-Service-Account-Restrictions` | Prevent interactive logon by non-human service identities | Domain Controllers and Workstations computer OUs | Implemented and validated |
 | `GPO-SEC-T0-Administrative-Restrictions` | Prevent lower-tier administrative identities from interactively accessing Tier 0 Domain Controller infrastructure | `OU=Domain Controllers,DC=banking,DC=lab` | Implemented and validated |
 
@@ -80,12 +80,14 @@ Establish the domain-level password and account-lockout security baseline for `b
 | Setting | Implemented Value |
 | --- | --- |
 | Account lockout threshold | 5 invalid attempts |
-| Account lockout duration | 15 minutes |
-| Reset account lockout counter after | 15 minutes |
+| Account lockout duration | 30 minutes |
+| Reset account lockout counter after | 30 minutes |
 
 ### Domain Account Policy Validation
 
 The effective domain password and account-lockout policy was validated after implementation against the Active Directory domain policy.
+
+The implemented account-lockout duration and reset window are 30 minutes, consistent with the post-implementation evidence captured when the domain policy was configured.
 
 ### Domain Account Policy Evidence
 
@@ -327,13 +329,15 @@ The Tier 0 administrative group is absent from the effective deny assignments.
 
 No interactive authentication attempt using a service identity or lower-tier administrative identity was required to validate the control.
 
-### Tier 0 Remote Desktop State
+### Tier 0 Remote Desktop Access Control
 
-Remote Desktop Services on `AU-SYD-DC01` remain disabled.
+The Tier 0 control defines `Deny log on through Remote Desktop Services` as an IAM access restriction for lower-tier administrative identities.
 
-The Tier 0 control defines the applicable RDP deny rights as a defence-in-depth access restriction without enabling Remote Desktop Services.
+The control does not depend on Remote Desktop Services being enabled or disabled. Its purpose is to ensure that the defined lower-tier administrative groups remain denied RDP interactive logon to Tier 0 Domain Controller infrastructure whenever the service is available.
 
-The implementation therefore preserves the pre-existing disabled RDP state while defining appropriate access restrictions should the service subsequently become available.
+The service identities remain subject to the corresponding RDP deny right through the effective User Rights Assignment.
+
+Remote Desktop service exposure is treated separately from the IAM access restriction itself.
 
 ### Tier 0 Control Evidence
 
@@ -404,9 +408,19 @@ The host reported:
 - Remote Desktop firewall rules disabled
 - No TCP/3389 listener detected
 
-The implementation preserves this disabled state.
+This represents the pre-implementation state captured at the time of the baseline assessment.
 
-RDP remains relevant both as an administrative access mechanism and as a potential attacker-facing service if exposed or enabled. The implemented deny User Rights Assignments therefore provide defence-in-depth restrictions without requiring RDP to be enabled.
+Subsequent assurance validation identified that `DC Security Hardening` currently configures:
+
+```powershell
+fDenyTSConnections = 0
+```
+
+and that TCP/3389 is listening locally on `AU-SYD-DC01`.
+
+The standard Remote Desktop firewall rules remain disabled, and independent network validation from `au-syd-secops01` observed TCP/3389 as filtered.
+
+RDP therefore remains relevant both as an administrative access mechanism and as a potential attacker-facing service. The implemented service-account and lower-tier administrative deny User Rights Assignments provide defence-in-depth IAM restrictions independently of the service exposure state.
 
 ---
 
