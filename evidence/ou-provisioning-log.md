@@ -8,10 +8,10 @@
 
 | Component | Value |
 | --- | --- |
-| Domain Controller | AU-SYD-DC01 |
-| Domain | banking.lab |
-| Forest Root | banking.lab |
-| Base Distinguished Name | DC=banking,DC=lab |
+| Domain Controller | `AU-SYD-DC01` |
+| Domain | `banking.lab` |
+| Forest Root | `banking.lab` |
+| Base Distinguished Name | `DC=banking,DC=lab` |
 | Platform | Windows Server 2022 |
 | Provisioning Method | PowerShell / Active Directory module |
 
@@ -21,7 +21,7 @@ Programmatically provision the enterprise Active Directory organisational unit h
 
 ## Initial Provisioning Execution
 
-The `New-BankingOU.ps1` script was executed from an elevated PowerShell session on AU-SYD-DC01.
+The `New-BankingOU.ps1` script was executed from an elevated PowerShell session on `AU-SYD-DC01`.
 
 The initial execution successfully created the required organisational units.
 
@@ -118,7 +118,7 @@ Tier2_User_Computing          OU=Tier2_User_Computing,DC=banking,DC=lab
 Workstations                  OU=Workstations,OU=Tier2_User_Computing,DC=banking,DC=lab
 ```
 
-The validation confirmed that the expected custom organisational units exist within the banking.lab domain.
+The validation confirmed that all 14 expected project-defined organisational units exist within the `banking.lab` domain.
 
 ## OU Count Validation
 
@@ -133,4 +133,4 @@ Get-ADOrganizationalUnit -Filter * |
 Count    : 15
 ```
 
-The total of 15 organisational units includes the 13 custom organisational units provisioned for this project and the existing default Active Directory organisational units.
+The total of 15 organisational units includes the 14 custom organisational units provisioned for this project and the existing `Domain Controllers` organisational unit.

@@ -8,8 +8,6 @@ The model establishes a controlled Active Directory identity structure for privi
 
 The design is intended to demonstrate enterprise identity governance principles applicable to a banking environment, including least privilege, administrative separation, role-based access control and controlled service-account management.
 
----
-
 ## Target Environment
 
 | Component | Value |
@@ -24,8 +22,6 @@ The design is intended to demonstrate enterprise identity governance principles 
 | Account Definition Source | employees.csv |
 | Provisioning Script | Import-BankingUsers.ps1 |
 
----
-
 ## Identity Population
 
 The IAM model uses a controlled 10-identity footprint consisting of:
@@ -38,8 +34,6 @@ The IAM model uses a controlled 10-identity footprint consisting of:
 | **Total** | **10** | **Controlled IAM test population** |
 
 The identity population is intentionally limited to a defined test dataset so that account provisioning, RBAC assignment and validation can be independently verified.
-
----
 
 ## Account Classification
 
@@ -60,8 +54,6 @@ Standard accounts are configured to require password change at first logon.
 
 They are not configured with `PasswordNeverExpires` or `CannotChangePassword`.
 
----
-
 ### Privileged Accounts
 
 Privileged accounts are dedicated administrative identities used to perform elevated administrative functions.
@@ -79,8 +71,6 @@ The model contains three privileged identities:
 Privileged accounts are configured with `AccountNotDelegated = True` to reduce exposure to credential delegation attacks.
 
 Privileged accounts are not configured with `PasswordNeverExpires`.
-
----
 
 ### Service Accounts
 
@@ -104,8 +94,6 @@ The following controls are applied during provisioning:
 - Accidental deletion protection enabled
 
 Interactive logon restrictions are intentionally deferred to the Group Policy implementation stage.
-
----
 
 ## Naming Convention
 
@@ -149,8 +137,6 @@ Examples: `svc-sql-banking`, `svc-sentinel-log`, `svc-app-portal`
 
 The `svc-` prefix clearly identifies non-human identities.
 
----
-
 ## Display Name Convention
 
 The Active Directory `SamAccountName` is treated as the stable account identifier.
@@ -168,8 +154,6 @@ For example:
 
 Changing the display attributes does not change the account's SAM identifier or RBAC assignment.
 
----
-
 ## User Principal Name
 
 User Principal Names follow the Active Directory domain namespace:
@@ -181,8 +165,6 @@ User Principal Names follow the Active Directory domain namespace:
 Examples: `adm.jc.olfato@banking.lab`, `emily.taylor@banking.lab`, `svc-sql-banking@banking.lab`
 
 The UPN provides a consistent authentication identifier while preserving the underlying account naming convention.
-
----
 
 ## OU Placement Model
 
@@ -198,11 +180,10 @@ Account placement follows the administrative and operational boundaries establis
 
 OU placement provides the structural foundation for applying differentiated Group Policy and administrative controls.
 
----
-
 ## RBAC Assignment Model
 
-Each identity receives a defined primary Global Security Group based on its role.
+Each identity receives a designated project RBAC Global Security Group based on its role.
+
 The account-to-group relationship is intentionally explicit:
 
 ```text
@@ -214,7 +195,7 @@ Identity
    |
    +-- Target OU
    |
-   +-- Primary RBAC Group
+   +-- Designated RBAC Group
 ```
 
 ### Privileged RBAC
@@ -242,9 +223,9 @@ Identity
 | `svc-sentinel-log` | `GG-Department-IT` |
 | `svc-app-portal` | `GG-Department-IT` |
 
-RBAC membership is validated independently after provisioning.
+The designated RBAC group represents the project-defined role assignment for each controlled identity. It does not modify or represent the native Active Directory `primaryGroupID` attribute.
 
----
+RBAC membership is validated independently after provisioning.
 
 ## Account Security Controls
 
@@ -259,16 +240,15 @@ The provisioning model applies differentiated security attributes based on accou
 | Account Not Delegated | Yes | No | Yes |
 | Accidental Deletion Protection | Yes | Yes | Yes |
 | Dedicated OU Placement | Yes | Yes | Yes |
-| Primary RBAC Group | Yes | Yes | Yes |
+| Designated RBAC Group | Yes | Yes | Yes |
 | Interactive Logon Restriction | GPO stage | N/A | GPO stage |
 
 The controls are applied according to the intended account function rather than uniformly across all identities.
 
----
-
 ## Password Management
 
 Initial passwords are generated programmatically by the provisioning script.
+
 The provisioning process:
 
 1. Generates a random initial password.
@@ -281,12 +261,12 @@ Initial passwords are deliberately excluded from provisioning logs and repositor
 
 Service-account passwords are configured not to expire as part of this laboratory implementation. Additional credential-management controls may be introduced in a production environment through managed service accounts, privileged access management or dedicated secrets-management platforms.
 
----
-
-### Account Protection
+## Account Protection
 
 All provisioned accounts are configured with Active Directory accidental-deletion protection.
+
 This control is validated independently using the ProtectedFromAccidentalDeletion attribute.
+
 Privileged and service identities additionally use:
 
 ```text
@@ -295,9 +275,7 @@ AccountNotDelegated = True
 
 to provide an additional control against inappropriate Kerberos delegation scenarios.
 
----
-
-### Provisioning Source of Truth
+## Provisioning Source of Truth
 
 The account population is defined in:
 
@@ -325,12 +303,12 @@ Active Directory
 
 This approach allows the account population to be reviewed independently from the PowerShell implementation.
 
----
-
 ## Idempotent Provisioning
 
 The provisioning script is designed to be safely re-executed.
+
 Existing accounts are detected by `SamAccountName` and skipped rather than recreated.
+
 Expected behaviour:
 
 ```text
@@ -344,6 +322,7 @@ Account already exists
 ```
 
 The provisioning implementation was executed a second time after initial provisioning and returned `[SKIP]` results for all 10 existing identities.
+
 The resulting validation completed with:
 
 ```text
@@ -352,11 +331,10 @@ Validation failures: 0
 
 This demonstrates repeatable provisioning without duplicate account creation.
 
----
-
 ## Validation Requirements
 
 The completed account model is validated against Active Directory using multiple independent checks.
+
 Validation includes:
 
 - Account existence
@@ -377,25 +355,25 @@ The validation process is documented separately in:
 evidence/user-provisioning-log.md
 ```
 
----
+## Scope and Control Boundaries
 
-## Scope and Deferred Controls
+This account model focuses on identity provisioning and foundational account-level security controls.
 
-This implementation focuses on identity provisioning and foundational account security controls.
-The following controls are intentionally deferred to later implementation stages:
+Controls implemented outside the provisioning workflow are documented separately.
 
-- Interactive logon restrictions for service accounts
-- Group Policy enforcement
-- Advanced workstation restrictions
-- Privileged administrative workstation controls
-- Authentication hardening
-- Service-account logon rights
-- Credential rotation automation
-- Security monitoring and alerting
+These include:
 
-Deferring these controls maintains a clear separation between identity provisioning and subsequent policy enforcement.
+- domain account policy;
+- LDAP signing;
+- service-account interactive-logon restrictions;
+- Tier 0 administrative logon restrictions; and
+- Group Policy enforcement.
 
----
+These controls are implemented through Group Policy and documented in:
+
+`../documentation/gpo-security-controls.md`
+
+Security monitoring, advanced workstation hardening, privileged administrative workstation controls, credential rotation automation and broader authentication hardening remain outside the scope of this account-provisioning model.
 
 ## Security Design Principles
 
@@ -429,8 +407,6 @@ Account protection, delegation controls, password controls, OU separation and RB
 
 Identity creation is automated through a declarative CSV source and an idempotent PowerShell provisioning process.
 
----
-
 ## Implementation Status
 
 | Capability | Status |
@@ -446,4 +422,4 @@ Identity creation is automated through a declarative CSV source and an idempoten
 | Idempotency validation | Complete |
 | Independent AD validation | Complete |
 | Identity attribute standardisation | Complete |
-| Service-account interactive logon restriction | Deferred to GPO stage |
+| Service-account interactive logon restriction | Complete through GPO |

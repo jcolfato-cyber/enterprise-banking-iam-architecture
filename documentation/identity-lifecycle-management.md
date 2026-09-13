@@ -10,8 +10,6 @@ The objective is to ensure that identities receive appropriate access throughout
 
 The model is aligned with the principles of least privilege, role-based access control, administrative separation and controlled identity governance.
 
----
-
 ## Lifecycle Model
 
 The identity lifecycle is represented by the following process:
@@ -47,8 +45,6 @@ Identity Requirement
 ```
 
 Each lifecycle stage has defined security objectives and administrative controls.
-
----
 
 ## Lifecycle Stages
 
@@ -97,7 +93,7 @@ The provisioning process establishes:
 - Target OU
 - Enabled state
 - Security attributes
-- Primary RBAC group membership
+- Designated RBAC group membership
 
 The provisioning process is automated through PowerShell using the Active Directory module.
 
@@ -105,22 +101,21 @@ The provisioning process is automated through PowerShell using the Active Direct
 
 Accounts are classified according to their operational purpose.
 
-| Account Type | Purpose | Administrative Boundary |
+| Account Type | Purpose | Administrative / Structural Boundary |
 | --- | --- | --- |
 | Privileged | Elevated administrative operations | Tier 0, Tier 1 or Tier 2 |
-| Standard | Normal workforce activity | Tier 2 |
+| Standard | Normal workforce activity | Tier 2 user-computing structure |
 | Service | Application, infrastructure or monitoring functions | Dedicated service identity boundary |
 
 Account classification determines the appropriate OU, RBAC group and security controls.
 The detailed account model is documented in:
 
-```text
-configuration/user-account-model.md
-```
+`../configuration/user-account-model.md`
 
 ### 4. Access Assignment
 
-Access is assigned through Global Security Groups rather than direct user-to-resource permissions.
+Project-defined role assignments are represented through Global Security Groups rather than direct user-to-resource permissions.
+
 The RBAC model associates identities with defined administrative or business roles.
 
 Examples include:
@@ -233,7 +228,10 @@ The current implementation applies:
 - `AccountNotDelegated = True`
 - Accidental deletion protection
 
-Interactive logon restrictions are deferred to the Group Policy implementation stage.
+Interactive and Remote Desktop logon restrictions are enforced separately through Group Policy on the applicable systems.
+
+Detailed implementation is documented in: `gpo-security-controls.md`
+
 In a production environment, service identities should additionally be evaluated for managed service accounts, privileged access management and centralised secrets management.
 
 ### 9. Identity Review
@@ -325,12 +323,12 @@ Deletion should occur only after:
 
 For service identities, deletion must also account for applications, scheduled tasks, services and dependencies that may still reference the account.
 
----
-
 ## Idempotent Provisioning
 
 The provisioning process is designed to be safely re-executed.
-The PowerShell provisioning script detects existing identities by SamAccountName.
+
+The PowerShell provisioning script detects existing identities by `SamAccountName`.
+
 Expected behaviour:
 
 ```text
@@ -349,8 +347,6 @@ The provisioning implementation was successfully executed a second time after th
 All 10 existing identities were detected and skipped, and validation completed with zero failures.
 This demonstrates repeatable provisioning without duplicate account creation.
 
----
-
 ## Identity Security Controls
 
 The lifecycle model applies security controls according to identity type.
@@ -364,20 +360,21 @@ The lifecycle model applies security controls according to identity type.
 | PasswordNeverExpires | No | No | Yes |
 | CannotChangePassword | No | No | Yes |
 | Accidental deletion protection | Yes | Yes | Yes |
-| Interactive logon restriction | Deferred to GPO | N/A | Deferred to GPO |
+| Interactive logon restriction | Tier-dependent GPO | N/A | GPO enforced |
+
+Privileged interactive-logon restrictions are tier-dependent. Tier 1 and Tier 2 administrative identities are restricted from interactive and Remote Desktop logon to the Domain Controller, while Tier 0 administrative access is preserved.
+
+Service-account interactive and Remote Desktop logon restrictions are enforced through Group Policy on `AU-SYD-DC01` and `AU-SYD-W101`.
 
 The controls are intentionally differentiated according to the role and risk profile of each identity type.
 
----
-
-### Audit and Evidence
+## Audit and Evidence
 
 Identity lifecycle activities should produce sufficient evidence to support administrative review and audit.
+
 The current implementation maintains evidence through:
 
-```text
-evidence/user-provisioning-log.md
-```
+`../evidence/user-provisioning-log.md`
 
 and supporting screenshots under:
 
@@ -397,8 +394,6 @@ Evidence includes:
 - Account security attributes
 
 Sensitive credentials and initial passwords are excluded from repository evidence.
-
----
 
 ## Automation and Repeatability
 
@@ -435,26 +430,24 @@ This separation provides:
 - Controlled changes to the identity population
 - Improved auditability
 
----
+## Out-of-Scope and Deferred Lifecycle Capabilities
 
-## Deferred Lifecycle Controls
+The laboratory implementation establishes a foundational identity lifecycle model together with implemented IAM provisioning and policy controls.
 
-The current laboratory implementation establishes the foundational identity lifecycle model.
-The following capabilities are intentionally deferred to subsequent implementation stages:
+The following lifecycle capabilities remain outside the implemented automation scope:
 
-- Group Policy-based interactive logon restrictions
-- Automated joiner/mover/leaver workflows
-- Privileged access management
-- Automated credential rotation
-- Managed service account deployment
-- Centralised secrets management
-- Automated periodic access reviews
-- Dormant account detection
-- SIEM-based identity monitoring
-- Automated deprovisioning workflows
-These controls represent the next layer of enterprise IAM maturity rather than requirements for the foundational account provisioning implementation.
+- automated joiner/mover/leaver workflows;
+- privileged access management;
+- automated credential rotation;
+- managed service account deployment;
+- centralised secrets management;
+- automated periodic access reviews;
+- dormant account detection; and
+- automated deprovisioning workflows.
 
----
+Security event monitoring, identity-threat detection and SIEM-based analysis are intentionally outside the scope of this IAM architecture and are addressed separately within the Enterprise Banking Security Monitoring and AD Threat Detection project.
+
+These boundaries preserve the separation between IAM architecture and implementation, identity governance automation, and security operations.
 
 ## Security Design Principles
 
@@ -488,8 +481,6 @@ Automated provisioning ensures that defined account populations can be consisten
 
 Provisioning and validation activities are documented through structured evidence.
 
----
-
 ## Implementation Status
 
 | Capability | Status |
@@ -510,12 +501,12 @@ Provisioning and validation activities are documented through structured evidenc
 | Deprovisioning model | Defined |
 | Identity deletion model | Defined |
 | Automated joiner/mover/leaver workflow | Deferred |
-| Group Policy-based interactive logon restrictions | Deferred |
+| Group Policy-based interactive logon restrictions | Complete |
 | Privileged access management | Deferred |
 | Automated credential rotation | Deferred |
 | Managed service account deployment | Deferred |
 | Centralised secrets management | Deferred |
 | Automated periodic access reviews | Deferred |
 | Dormant account detection | Deferred |
-| SIEM-based identity monitoring | Deferred |
+| SIEM-based identity monitoring | Out of scope — separate security monitoring project |
 | Automated deprovisioning workflows | Deferred |

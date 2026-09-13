@@ -2,20 +2,15 @@
 
 ## Purpose
 
-This document records the final security-assurance validation of the
-`banking.lab` identity and access management architecture.
+This document records the final security-assurance validation of the `banking.lab` identity and access management architecture.
 
-The validation was performed after completion of the organisational unit
-architecture, RBAC model, identity provisioning and Group Policy security
-controls. Its purpose is to determine whether the deployed Active Directory
-environment conforms to the IAM architecture implemented by the project.
+The validation was performed after completion of the organisational unit architecture, RBAC model, identity provisioning and Group Policy security controls. Its purpose is to determine whether the deployed Active Directory environment conforms to the IAM architecture implemented by the project.
 
 The assurance process follows the project methodology:
 
 ### DESIGN → IMPLEMENT → APPLY → VALIDATE → CAPTURE EVIDENCE → DOCUMENT → CLOSE
 
-The validation activity is assurance-focused and does not automatically
-remediate detected configuration differences.
+The validation activity is assurance-focused and does not automatically remediate detected configuration differences.
 
 ## Validation Scope
 
@@ -46,8 +41,7 @@ The controlled IAM population consists of ten project identities:
 | Service | 3 |
 | **Total** | **10** |
 
-Built-in Active Directory accounts and other operating-system identities are
-outside the controlled project identity population.
+Built-in Active Directory accounts and other operating-system identities are outside the controlled project identity population.
 
 ## Validation Environment
 
@@ -63,25 +57,17 @@ outside the controlled project identity population.
 
 The primary assurance script was executed locally on `AU-SYD-DC01`.
 
-A supplementary network-exposure validation was performed independently from
-`au-syd-secops01`.
+A supplementary network-exposure validation was performed independently from `au-syd-secops01`.
 
 ## Validation Methodology
 
-The assurance script performs read-only validation of Active Directory,
-Group Policy, effective security policy, registry state and local network
-exposure indicators.
+The assurance script performs read-only validation of Active Directory, Group Policy, effective security policy, registry state and local network exposure indicators.
 
-The script does not create, modify, move or remove Active Directory objects,
-security groups, Group Policy objects or IAM configuration.
+The script does not create, modify, move or remove Active Directory objects, security groups, Group Policy objects or IAM configuration.
 
-Where effective security state is authoritative, validation is performed
-against the effective configuration rather than by performing unnecessary
-interactive logon attempts.
+Where effective security state is authoritative, validation is performed against the effective configuration rather than by performing unnecessary interactive logon attempts.
 
-Effective User Rights Assignment was inspected using a temporary security
-policy export. The temporary export was used only for validation and did not
-modify the IAM control plane.
+Effective User Rights Assignment was inspected using a temporary security policy export. The temporary export was used only for validation and did not modify the IAM control plane.
 
 Validation results use the following states:
 
@@ -102,7 +88,7 @@ Validation results use the following states:
 | IAM-VAL-05 | Privileged Tiering | PASS | Tier 0, Tier 1 and Tier 2 controlled administrative identities remain separated with no project cross-tier membership |
 | IAM-VAL-06 | Privileged Account Controls | PASS | All three privileged identities retain the approved persistent account-security controls |
 | IAM-VAL-07 | Service Accounts | PASS | All three service identities retain the approved non-human account-security controls |
-| IAM-VAL-08 | GPO Architecture | PASS | Required GPOs exist, Default Domain Policy is linked at domain scope and the four approved Domain Controllers GPOs are linked and enabled |
+| IAM-VAL-08 | GPO Architecture | PASS | Required GPOs exist, `Default Domain Policy` is linked at domain scope and the four approved GPO links at the Domain Controllers OU are present and enabled |
 | IAM-VAL-09 | GPO Precedence | PASS | Domain Controllers GPO precedence remains in the approved order |
 | IAM-VAL-10 | Domain Account Policy | PASS | Effective domain password and account-lockout policy matches the implemented configuration |
 | IAM-VAL-11 | LDAP Signing | PASS | Effective `LDAPServerIntegrity` remains `2` |
@@ -114,18 +100,14 @@ Validation results use the following states:
 
 ## Organisational Unit Validation
 
-The validator confirmed the complete fourteen-OU IAM hierarchy under
-`banking.lab`.
+The validator confirmed the complete fourteen-OU IAM hierarchy under `banking.lab`.
 
-All required OUs exist at their documented distinguished names and retain
-`ProtectedFromAccidentalDeletion=True`.
+All required OUs exist at their documented distinguished names and retain `ProtectedFromAccidentalDeletion=True`.
 
 The final workstation placement was also retained:
 
 ```text
-
 CN=AU-SYD-W101,OU=Workstations,OU=Tier2_User_Computing,DC=banking,DC=lab
-
 ```
 
 This placement reflects the final deployed architecture.
@@ -133,6 +115,7 @@ This placement reflects the final deployed architecture.
 ## Identity Population and Classification
 
 All ten controlled IAM identities were resolved successfully.
+
 The deployed population remains:
 
 | Classification | Expected | Validated |
@@ -143,6 +126,7 @@ The deployed population remains:
 | **Total** | **10** | **10** |
 
 Identity placement was compared against the declarative definitions in `employees.csv`.
+
 No expected controlled identity was missing.
 
 ## RBAC Validation
@@ -155,8 +139,7 @@ All eleven project-defined RBAC groups were validated for:
 - Security group category
 - controlled-identity membership
 
-The three controlled privileged identities remain mapped to their respective
-administrative tiers:
+The three controlled privileged identities remain mapped to their respective administrative tiers:
 
 | Tier | Identity | Project RBAC Group |
 | --- | --- | --- |
@@ -168,8 +151,7 @@ No cross-tier project membership was detected among the controlled privileged id
 
 ## Privileged Account Validation
 
-The three privileged identities retain the required persistent controls,
-including:
+The three privileged identities retain the required persistent controls, including:
 
 - enabled account state
 - `AccountNotDelegated=True`
@@ -199,16 +181,16 @@ Each service identity remains:
 - protected from accidental deletion
 - assigned to the expected project RBAC group
 
-Interactive-logon restrictions were validated separately through effective
-User Rights Assignment.
+Interactive-logon restrictions were validated separately through effective User Rights Assignment.
 
 ## Group Policy Validation
 
 The deployed Group Policy architecture contains the required policies for the implemented IAM design.
+
 At domain scope:
 
 ```text
-Default Domain Policy
+Order 1  Default Domain Policy
 ```
 
 At the Domain Controllers OU:
@@ -239,11 +221,13 @@ The effective domain account policy was validated as:
 | Reversible encryption | Disabled |
 
 The assurance exercise confirmed that the implemented lockout duration and reset window are 30 minutes.
+
 This value is consistent with the implementation evidence captured when the domain policy was configured.
 
 ## LDAP Signing Validation
 
 LDAP signing enforcement remains effective on `AU-SYD-DC01`.
+
 The effective registry state is:
 
 ```text
@@ -251,6 +235,7 @@ LDAPServerIntegrity = 2
 ```
 
 This corresponds to requiring LDAP signing.
+
 The validated precedence of `DC Security Hardening` continues to preserve this effective setting.
 
 ## Interactive Logon Restriction Validation
@@ -273,6 +258,7 @@ svc-app-portal
 ```
 
 The Tier 0 project group remains absent from the deny assignments.
+
 This preserves the intended administrative tier model without requiring interactive logon attempts using restricted identities.
 
 ## Remote Desktop Exposure Validation
@@ -285,29 +271,30 @@ TCP/3389 listening locally
 Remote Desktop firewall rules disabled
 ```
 
-Because RDP is locally enabled and listening, `IAM-VAL-14` is retained as a
-WARN observation rather than being reported as an IAM control failure.
-The IAM-specific controls governing RDP access remain effective through
-`IAM-VAL-12` and `IAM-VAL-13`.
+Because RDP is locally enabled and listening, `IAM-VAL-14` is retained as a WARN observation rather than being reported as an IAM control failure.
+
+The IAM-specific controls governing RDP access remain effective through `IAM-VAL-12` and `IAM-VAL-13`.
+
 An independent network validation was performed from `au-syd-secops01` using:
 
 ```text
 nmap -Pn -p 53,88,135,139,389,445,464,636,3268,3269,3389 10.10.10.10
 ```
 
-The domain controller responded with the expected Active Directory services
-available while TCP/3389 was observed as:
+The domain controller responded with the expected Active Directory services available while TCP/3389 was observed as:
 
 ```text
 3389/tcp filtered
 ```
 
-This indicates that the RDP listener was not reachable from the controlled security-testing host during the validation exercise.
+The `filtered` result indicates that TCP/3389 probes from the controlled security-testing host did not receive a response permitting Nmap to establish the port as open during the validation exercise.
+
 The Nmap result is supplementary network evidence and is not generated by the local IAM assurance script.
 
 ## Provisioning Integrity Validation
 
 The assurance script did not rerun the state-capable identity provisioning script.
+
 Instead, provisioning integrity was validated read-only by confirming that:
 
 - the declarative dataset contains the expected ten identities
@@ -321,13 +308,17 @@ Historical provisioning evidence separately demonstrates that a previous second 
 ## Findings
 
 No mandatory IAM assurance control failed.
+
 One residual observation remains:
 
 ### RDP Exposure — WARN
 
 RDP is locally enabled and TCP/3389 is listening on `AU-SYD-DC01`. The Remote Desktop firewall rules remain disabled, and independent validation from `au-syd-secops01` observed TCP/3389 as filtered.
+
 This observation does not invalidate the implemented IAM architecture.
+
 Effective service-account and lower-tier administrative RDP deny rights remain in force.
+
 The aggregate `IAM-VAL-16` result is therefore WARN because it inherits this single residual observation.
 
 ## Evidence Register

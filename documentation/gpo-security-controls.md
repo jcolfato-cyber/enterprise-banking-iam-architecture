@@ -18,8 +18,6 @@ The implementation follows an evidence-driven control lifecycle:
 
 ### Design → Implement → Apply → Validate Effective State → Capture Evidence → Document → Close
 
----
-
 ## Scope
 
 The Group Policy implementation applies to the `banking.lab` Active Directory laboratory environment.
@@ -39,8 +37,6 @@ The Group Policy implementation applies to the `banking.lab` Active Directory la
 - Workstations: `OU=Workstations,OU=Tier2_User_Computing,DC=banking,DC=lab`
 - Service Accounts: `OU=Service_Accounts,DC=banking,DC=lab`
 
----
-
 ## GPO Architecture
 
 The implemented architecture uses the existing `Default Domain Policy` for domain account security together with three project security GPOs supporting Domain Controller security, service-account restrictions and administrative tier isolation.
@@ -48,11 +44,9 @@ The implemented architecture uses the existing `Default Domain Policy` for domai
 | GPO | Purpose | Effective Scope | Status |
 | --- | --- | --- | --- |
 | `Default Domain Policy` | Domain password and account-lockout policy | `banking.lab` domain | Implemented and validated |
-| `DC Security Hardening` | Domain Controller LDAP signing enforcement and existing DC security configuration | `OU=Domain Controllers,DC=banking,DC=lab` | Implemented and validated |
+| `DC Security Hardening` | Domain Controller LDAP signing enforcement | `OU=Domain Controllers,DC=banking,DC=lab` | Implemented and validated |
 | `GPO-SEC-Service-Account-Restrictions` | Prevent interactive logon by non-human service identities | Domain Controllers and Workstations computer OUs | Implemented and validated |
 | `GPO-SEC-T0-Administrative-Restrictions` | Prevent lower-tier administrative identities from interactively accessing Tier 0 Domain Controller infrastructure | `OU=Domain Controllers,DC=banking,DC=lab` | Implemented and validated |
-
----
 
 ## Workstream 1 — Domain Account Policy
 
@@ -95,8 +89,6 @@ The implemented account-lockout duration and reset window are 30 minutes, consis
 - `screenshots/group-policy/00D-post-domain-password-policy.png`
 
 Status: `Implemented and validated`
-
----
 
 ## Workstream 2 — Domain Controller LDAP Signing
 
@@ -158,8 +150,6 @@ Following policy application, the effective security policy and NTDS registry st
 - `screenshots/group-policy/00G-final-gpo-precedence-validation.png`
 
 Status: `Implemented and validated`
-
----
 
 ## Workstream 3 — Service Account Interactive Logon Restrictions
 
@@ -233,8 +223,6 @@ This validates the service-account control across both current computer assets i
 - `screenshots/group-policy/04-workstation-service-account-policy-validation.png`
 
 Status: `Implemented and validated`
-
----
 
 ## Workstream 4 — Tier 0 Administrative Restrictions
 
@@ -346,7 +334,21 @@ Remote Desktop service exposure is treated separately from the IAM access restri
 
 Status: `Implemented and validated`
 
----
+## Domain-Level GPO Precedence
+
+The domain-level account policy is provided through the existing `Default Domain Policy`.
+
+Final domain link order for:
+
+`DC=banking,DC=lab`
+
+is:
+
+| Order | GPO | Enabled | Enforced |
+| ---: | --- | --- | --- |
+| 1 | `Default Domain Policy` | Yes | No |
+
+The `Default Domain Policy` provides the validated domain password and account-lockout settings documented in Workstream 1.
 
 ## Final Domain Controllers GPO Precedence
 
@@ -366,8 +368,6 @@ is:
 `DC Security Hardening` retains the highest link precedence to preserve the validated LDAP signing configuration.
 
 `GPO-SEC-T0-Administrative-Restrictions` has higher precedence than `GPO-SEC-Service-Account-Restrictions` for the overlapping deny User Rights Assignments and contains the complete five-principal deny set.
-
----
 
 ## Pre-Implementation Environment Assessment
 
@@ -422,7 +422,11 @@ The standard Remote Desktop firewall rules remain disabled, and independent netw
 
 RDP therefore remains relevant both as an administrative access mechanism and as a potential attacker-facing service. The implemented service-account and lower-tier administrative deny User Rights Assignments provide defence-in-depth IAM restrictions independently of the service exposure state.
 
----
+This final RDP exposure state is retained as a residual assurance observation. It does not represent a mandatory IAM control failure because the implemented deny User Rights Assignments remain effective independently of RDP service exposure.
+
+The final assurance result is documented in:
+
+`iam-security-validation.md`
 
 ## Evidence Register
 
@@ -442,8 +446,6 @@ RDP therefore remains relevant both as an administrative access mechanism and as
 | `05-tier0-gpo-configuration.png` | Tier 0 administrative restriction GPO configuration |
 | `06-tier0-administrative-restrictions-validation.png` | Effective Tier 0 restriction and Tier 0 identity preservation validation |
 
----
-
 ## Implementation Status
 
 | Capability | Status |
@@ -460,8 +462,6 @@ RDP therefore remains relevant both as an administrative access mechanism and as
 | Evidence capture | Complete |
 | Technical implementation | Complete |
 
----
-
 ## Implementation Boundary
 
 This implementation provides Group Policy controls directly supporting the IAM and privileged-access architecture.
@@ -471,8 +471,6 @@ Broader Windows endpoint and server hardening controls—including application r
 Interactive logon notices are likewise not included as part of the IAM control set.
 
 This boundary keeps the implementation focused on identity security, authentication policy, privileged-access segmentation and non-human identity controls rather than expanding the project into a general Windows hardening baseline.
-
----
 
 ## Implementation Closure
 

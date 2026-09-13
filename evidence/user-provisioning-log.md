@@ -13,7 +13,7 @@ The evidence demonstrates:
 - Controlled account provisioning
 - Account classification
 - OU-based identity placement
-- RBAC group assignment
+- Designated RBAC group assignment
 - Account security attribute configuration
 - Accidental deletion protection
 - Idempotent re-execution
@@ -22,23 +22,19 @@ The evidence demonstrates:
 
 Sensitive credentials and initial account passwords are excluded from this evidence record.
 
----
-
 ## Target Environment
 
 | Component | Value |
 | --- | --- |
-| Domain Controller | AU-SYD-DC01 |
+| Domain Controller | `AU-SYD-DC01` |
 | Operating System | Windows Server 2022 |
-| Domain | banking.lab |
-| Forest Root | banking.lab |
+| Domain | `banking.lab` |
+| Forest Root | `banking.lab` |
 | Base Distinguished Name | `DC=banking,DC=lab` |
 | Directory Service | Active Directory Domain Services |
 | Provisioning Method | PowerShell / Active Directory module |
 | Account Definition Source | `scripts/powershell/employees.csv` |
 | Provisioning Script | `scripts/powershell/Import-BankingUsers.ps1` |
-
----
 
 ## Account Population
 
@@ -50,8 +46,6 @@ The provisioning dataset contains 10 identities:
 | Standard | 4 | `emily.taylor`, `james.anderson`, `olivia.thomas`, `daniel.moore` |
 | Service | 3 | `svc-sql-banking`, `svc-sentinel-log`, `svc-app-portal` |
 | **Total** | **10** | **Controlled IAM test population** |
-
----
 
 ## Provisioning Source
 
@@ -67,7 +61,8 @@ The provisioning logic is implemented in:
 scripts/powershell/Import-BankingUsers.ps1
 ```
 
-The provisioning process consumes the account definitions and creates or validates the corresponding Active Directory identities.
+The provisioning process consumes the account definitions and creates corresponding Active Directory identities when they do not already exist. Existing identities are detected and skipped to preserve idempotent behaviour.
+
 The implementation establishes:
 
 - SAM account name
@@ -80,18 +75,17 @@ The implementation establishes:
 - Enabled state
 - Password configuration
 - Account protection attributes
-- Primary RBAC group membership
+- Designated RBAC group membership
 
 Initial passwords are generated programmatically and are not recorded in repository evidence.
 
----
-
 ## Provisioning Result
 
-The provisioning script was executed from an elevated PowerShell session on AU-SYD-DC01.
+The provisioning script was executed from an elevated PowerShell session on `AU-SYD-DC01`.
+
 The provisioning implementation established the defined 10-account population within Active Directory. The resulting account population was subsequently validated against the defined account model.
 
-| Account | Type | Target OU | Primary RBAC Group |
+| Account | Type | Target OU | Designated RBAC Group |
 | --- | --- | --- | --- |
 | `adm.jc.olfato` | Privileged | `Privileged_Accounts` under Tier 0 | `GG-T0-AD-Administrators` |
 | `adm.syd.srv01` | Privileged | `Server_Admins` under Tier 1 | `GG-T1-Server-Administrators` |
@@ -103,8 +97,6 @@ The provisioning implementation established the defined 10-account population wi
 | `svc-sql-banking` | Service | `Service_Accounts` | `GG-Department-IT` |
 | `svc-sentinel-log` | Service | `Service_Accounts` | `GG-Department-IT` |
 | `svc-app-portal` | Service | `Service_Accounts` | `GG-Department-IT` |
-
----
 
 ## Post-Provisioning Identity Attribute Standardisation
 
@@ -136,22 +128,22 @@ The resulting Distinguished Name is:
 CN=JC Olfato,OU=Privileged_Accounts,OU=Tier0_Identity_Infrastructure,DC=banking,DC=lab
 ```
 
-The account's `SamAccountName` and primary RBAC membership were retained unchanged.
-This demonstrates separation between the stable account identifier and human-readable directory attributes, allowing display attributes to be maintained without changing the underlying account identity or RBAC assignment.
+The account's `SamAccountName` and designated RBAC membership were retained unchanged.
 
----
+This demonstrates separation between the stable account identifier and human-readable directory attributes, allowing display attributes to be maintained without changing the underlying account identity or RBAC assignment.
 
 ## Provisioning Validation
 
 The resulting Active Directory state was independently validated after provisioning.
-The provisioning validation process confirmed the expected account classification, OU placement, primary RBAC group and accidental deletion protection for all 10 identities.
+
+The provisioning validation process confirmed the expected account classification, OU placement, designated RBAC group and accidental deletion protection for all 10 identities.
 
 All 10 identities returned `[VALID]` status.
 Validation confirmed:
 
 - Account type
 - OU placement
-- Primary RBAC group
+- Designated RBAC group
 - Accidental deletion protection
 
 The validation completed with:
@@ -170,12 +162,12 @@ Validation failures: 0
 
 The provisioning validation therefore confirmed that the complete account population was deployed according to the defined account model.
 
----
-
 ## Idempotency Validation
 
 The provisioning script was executed a second time after the account population had already been deployed.
-Existing accounts were detected using their SamAccountName values.
+
+Existing accounts were detected using their `SamAccountName` values.
+
 The expected idempotent behaviour is:
 
 ```text
@@ -188,7 +180,7 @@ Account already exists
         |
         v
        SKIP
-````
+```
 
 The second execution returned `[SKIP]` for all 10 existing identities.
 Representative output:
@@ -223,8 +215,6 @@ Validation failures: 0
 
 The result demonstrates that the provisioning process can be safely re-executed without creating duplicate Active Directory identities.
 
----
-
 ## Account Count Validation
 
 The provisioned account population was independently queried from Active Directory against the defined 10-account dataset.
@@ -241,8 +231,6 @@ Count    : 10
 | Controlled account population | 10 | 10 | Valid |
 
 This confirms that all 10 identities in the defined provisioning dataset are present in Active Directory.
-
----
 
 ## Account Security Attribute Validation
 
@@ -286,13 +274,13 @@ Standard accounts are not configured with non-expiring passwords or the `CannotC
 | `svc-sql-banking` | True | True | True | True | True |
 
 Service identities use differentiated password and delegation controls appropriate to their non-human identity classification.
-Interactive logon restrictions remain deferred to the Group Policy implementation stage.
 
----
+At the time of this provisioning validation, interactive-logon restrictions were deferred to the subsequent Group Policy implementation stage. Those restrictions were later implemented and independently validated as part of the completed IAM security-control architecture.
 
 ## Privileged Identity Attribute Validation
 
 The Tier 0 privileged identity was additionally validated after its display-name standardisation.
+
 The account retains the stable SAM identifier:
 
 ```text
@@ -319,16 +307,15 @@ The resulting Distinguished Name confirms the Active Directory object common nam
 CN=JC Olfato,OU=Privileged_Accounts,OU=Tier0_Identity_Infrastructure,DC=banking,DC=lab
 ```
 
-The SAM account identifier and RBAC membership remained unchanged.
-
----
+The `SamAccountName` and designated RBAC membership remained unchanged.
 
 ## RBAC Membership Validation
 
 RBAC membership was independently validated using `Get-ADPrincipalGroupMembership`.
-The resulting primary Global Security Group assignments were:
 
-| Account | Primary RBAC Group |
+The resulting designated Global Security Group assignments were:
+
+| Account | Designated RBAC Group |
 | --- | --- |
 | `adm.jc.olfato` | `GG-T0-AD-Administrators` |
 | `adm.syd.srv01` | `GG-T1-Server-Administrators` |
@@ -341,9 +328,9 @@ The resulting primary Global Security Group assignments were:
 | `svc-sentinel-log` | `GG-Department-IT` |
 | `svc-app-portal` | `GG-Department-IT` |
 
-The validation confirmed that each identity has the expected primary RBAC assignment.
+The designated RBAC group represents the project-defined role assignment for each controlled identity. It does not represent or modify the native Active Directory `primaryGroupID` attribute.
 
----
+The validation confirmed that each identity has the expected designated RBAC assignment.
 
 ## Active Directory Placement Validation
 
@@ -393,8 +380,6 @@ CN=Service Backup,OU=Service_Accounts,DC=banking,DC=lab
 
 The validation confirms that account placement follows the defined identity and administrative boundaries.
 
----
-
 ## Evidence Mapping
 
 Supporting screenshots are maintained within the repository according to evidence type.
@@ -441,8 +426,6 @@ screenshots/validation/
 
 These screenshots provide visual evidence supporting the independent Active Directory validation results documented above.
 
----
-
 ## Validation Summary
 
 The completed validation activities produced the following results:
@@ -463,8 +446,6 @@ The completed validation activities produced the following results:
 | Duplicate accounts created | 0 |
 | Validation failures | 0 |
 
----
-
 ## Security Evidence Statement
 
 The user account provisioning implementation successfully established the defined Enterprise Banking IAM identity population within Active Directory.
@@ -474,7 +455,7 @@ The evidence demonstrates that:
 - Accounts are classified and placed within the intended OUs.
 - Privileged identities are separated from standard workforce identities.
 - Service identities are isolated within a dedicated OU.
-- Primary RBAC assignments are present.
+- Designated RBAC assignments are present.
 - Account security attributes are differentiated by identity type.
 - Accidental deletion protection is enabled.
 - Privileged and service identities use `AccountNotDelegated = True`.
@@ -482,9 +463,9 @@ The evidence demonstrates that:
 - Re-execution of the provisioning process does not create duplicate accounts.
 - Independent validation completed with zero failures.
 
-Interactive logon restrictions, credential rotation, managed service accounts, privileged access management and automated lifecycle workflows remain outside the current implementation scope and are deferred to subsequent stages.
+Interactive-logon restrictions were implemented subsequently through Group Policy and validated as part of the completed IAM security-control architecture.
 
----
+Credential rotation, managed service accounts, privileged access management and automated lifecycle workflows remain outside the implemented scope of this project.
 
 ## Repository Evidence
 

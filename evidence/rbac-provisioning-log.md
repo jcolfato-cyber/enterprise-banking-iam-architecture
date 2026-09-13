@@ -8,16 +8,16 @@
 
 | Component | Value |
 | --- | --- |
-| Domain Controller | AU-SYD-DC01 |
-| Domain | banking.lab |
-| Forest Root | banking.lab |
-| Base Distinguished Name | DC=banking,DC=lab |
+| Domain Controller | `AU-SYD-DC01` |
+| Domain | `banking.lab` |
+| Forest Root | `banking.lab` |
+| Base Distinguished Name | `DC=banking,DC=lab` |
 | Platform | Windows Server 2022 |
 | Provisioning Method | PowerShell / Active Directory module |
 
 ## Objective
 
-Programmatically provision the Global Security Groups supporting the Enterprise Banking IAM Role-Based Access Control (RBAC) model.
+Programmatically provision the 11 Global Security Groups supporting the Enterprise Banking IAM Role-Based Access Control (RBAC) model.
 
 The security group architecture separates administrative responsibilities across Tier 0, Tier 1 and Tier 2 security boundaries while providing department-based access control groups.
 
@@ -50,11 +50,9 @@ The provisioning script creates 11 Global Security Groups:
 
 All groups were provisioned as Global Security Groups.
 
----
-
 ## Initial Provisioning Execution
 
-The `New-BankingSecurityGroups.ps1` script was executed from an elevated PowerShell session on AU-SYD-DC01.
+The `New-BankingSecurityGroups.ps1` script was executed from an elevated PowerShell session on `AU-SYD-DC01`.
 
 The initial execution successfully created all 11 security groups.
 
@@ -304,4 +302,4 @@ Get-ADGroup -Filter * |
 Count    : 11
 ```
 
-The expected security group count is 11. The Active Directory validation returned a count of 11.
+The expected project-defined security group count is 11. Active Directory validation returned all 11 expected Global Security Groups.
