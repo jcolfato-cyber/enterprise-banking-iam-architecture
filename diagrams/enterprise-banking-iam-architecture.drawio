@@ -1,10 +1,13 @@
 <mxfile host="Electron">
   <diagram name="Page-1" id="3UQERE62glmB69sv-wcM">
-    <mxGraphModel dx="1885" dy="1145" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="0" page="1" pageScale="1" pageWidth="1600" pageHeight="900" math="0" shadow="0">
+    <mxGraphModel dx="1664" dy="1011" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="0" page="1" pageScale="1" pageWidth="1600" pageHeight="900" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="uWrHAwkJRjNDf1qWcO0z-32" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontSize=26;fontStyle=1;fontFamily=Arial;fontColor=light-dark(#052f56, #ededed);" value="&lt;font style=&quot;font-size: 28px;&quot;&gt;Enterprise Banking IAM Architechture&lt;/font&gt;&lt;div&gt;&lt;p class=&quot;p1&quot; style=&quot;margin: 0px; font-style: normal; font-variant: normal; font-size-adjust: none; font-language-override: normal; font-kerning: auto; font-optical-sizing: auto; font-feature-settings: normal; font-variation-settings: normal; font-weight: 400; font-stretch: normal; line-height: normal; font-family: Helvetica;&quot;&gt;&lt;font style=&quot;font-size: 18px;&quot;&gt;Tiered Active Directory, Identity &amp;amp; Group Policy Security Model&lt;/font&gt;&lt;/p&gt;&lt;/div&gt;" vertex="1">
+        <mxCell id="-6h7fzakLjA1kswASurO-1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;rotation=0;fillColor=none;strokeWidth=1;" value="" vertex="1">
+          <mxGeometry height="900" width="1600" as="geometry" />
+        </mxCell>
+        <mxCell id="uWrHAwkJRjNDf1qWcO0z-32" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontSize=26;fontStyle=1;fontFamily=Arial;fontColor=light-dark(#052f56, #ededed);" value="&lt;font style=&quot;font-size: 36px;&quot;&gt;Enterprise Banking IAM Architecture&lt;/font&gt;&lt;div&gt;&lt;p class=&quot;p1&quot; style=&quot;margin: 0px; font-style: normal; font-variant: normal; font-size-adjust: none; font-language-override: normal; font-kerning: auto; font-optical-sizing: auto; font-feature-settings: normal; font-variation-settings: normal; font-weight: 400; font-stretch: normal; line-height: normal; font-family: Helvetica;&quot;&gt;&lt;font style=&quot;font-size: 18px;&quot;&gt;Tiered Active Directory, Identity &amp;amp; Group Policy Security Model&lt;/font&gt;&lt;/p&gt;&lt;/div&gt;" vertex="1">
           <mxGeometry height="60" width="760" x="10" y="10" as="geometry" />
         </mxCell>
         <mxCell id="uWrHAwkJRjNDf1qWcO0z-33" parent="1" style="swimlane;whiteSpace=wrap;html=1;startSize=30;fillColor=light-dark(#033056, #6db2ff);strokeColor=light-dark(#083157, #b2cbff);rounded=1;glass=0;shadow=0;swimlaneFillColor=none;fontFamily=Arial;arcSize=7;fontColor=#ffffff;align=left;" value="&lt;div&gt;&lt;font style=&quot;font-size: 16px;&quot;&gt;&amp;nbsp; &amp;nbsp;Active Directory IAM Architecture (banking.lab)&lt;/font&gt;&lt;/div&gt;" vertex="1">
